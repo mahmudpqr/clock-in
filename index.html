@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Productivity Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app" data-tab="session">
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabS" aria-selected="true">Session &amp; options</button>
+    <button role="tab" id="tabH" aria-selected="false">History</button>
+  </div>
+
+  <div class="col left" id="left" data-sub="session">
+    <div class="subtabs" role="tablist">
+      <button role="tab" id="subS" aria-selected="true">Session</button>
+      <button role="tab" id="subO" aria-selected="false">Options</button>
+    </div>
+    <section class="card" id="sesCard" aria-label="Session">
+      <h2>Session</h2>
+      <div class="clock"><div class="time" id="time"></div><div class="date" id="date"></div></div>
+      <div class="status" id="status" data-s="off"><i class="dot"></i><div><b id="stP"></b><span id="stD"></span></div></div>
+      <div class="reading idle" id="reading"><span id="rdL">Not clocked in</span><b id="rdV">00:00:00</b></div>
+      <div class="btns">
+        <button class="primary" id="bIn">Clock in</button>
+        <button id="bBrk">Start break</button>
+        <button class="danger" id="bOut">Clock out</button>
+      </div>
+    </section>
+
+    <section class="card" id="optCard" aria-label="Options">
+      <h2>Options</h2>
+      <div class="row"><span class="lbl">Working hours</span>
+        <div class="range"><div class="tp" id="ws"></div><span>to</span><div class="tp" id="we"></div></div></div>
+      <div class="row"><span class="lbl">Overtime hours</span>
+        <div class="range"><div class="tp" id="os"></div><span>to</span><div class="tp" id="oe"></div></div>
+        <p class="hint">Within the same day.</p></div>
+      <div class="row"><label for="max">Max history size</label>
+        <input type="number" id="max" min="1" max="365" step="1">
+        <p class="hint">Between 1 and 365 days.</p></div>
+      <button class="primary" id="bSave">Save settings</button>
+      <p class="err" id="err" role="alert" hidden></p>
+      <p class="ok" id="msg" hidden></p>
+    </section>
+  </div>
+
+  <div class="col right">
+    <section class="card hist" aria-label="History">
+      <div class="hh"><h2>History</h2><button class="danger" id="bClear">Clear history</button></div>
+      <div class="list" id="list"></div>
+    </section>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog">
+    <h3 id="dT"></h3><p id="dM"></p>
+    <div class="dbtns"><button value="no">Cancel</button><button value="yes" class="danger solid" id="dY"></button></div>
+  </form>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
