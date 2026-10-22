@@ -59,7 +59,7 @@ function renderStatus(now){
   let p,det,cls='avail';
   if(o){
     const br=onBreak(openSlot());
-    cls=br?'break':o.slot;p=br?'On break':'Clocked in';det=NAME[o.slot]+' until '+m12(endMin(o.slot));
+    cls=br?'break':o.slot;p=br?'On break':'Clocked in';det=NAME[o.slot]+' until '+m12(endMin(o.slot))+'.';
   }else if(!slot){cls='off';p='No active slot';det=next}
   else if(today[slot].s.length){p='Clocked out';det=next}
   else{p=NAME[slot]+' available';det='Clock in to start your session.'}
@@ -68,13 +68,13 @@ function renderStatus(now){
   $('bBrk').textContent=o&&onBreak(openSlot())?'End break':'Start break';
   const sl=openSlot(),b=sl&&onBreak(sl),r=$('reading');
   r.classList.toggle('idle',!sl);r.classList.toggle('brk',!!b);
-  $('rdL').textContent=!sl?'Not clocked in':b?'Break time':'Time clocked in';
-  $('rdV').textContent=sl?hms(now-(b?last(sl.b).s:last(sl.s).i)):'00:00:00';
+  $('rdL').textContent=!sl?'Not clocked in':b?'Total break':'Total work';
+  $('rdV').textContent=sl?hms(stats(sl,now)[b?'b':'w']):'00:00:00';
 }
 function slotHtml(sl,s,now){
   const st=stats(sl,now);
-  const rg=sl.s.length?sl.s.map(x=>'<div>'+t12(x.i)+' – '+(x.o==null?'now':t12(x.o))+'</div>').join(''):'<div class="mut">None</div>';
-  return '<div class="slot '+s+'"><h4>'+SHORT[s]+'</h4><div class="k">Clocked in</div>'+rg+'<div class="k">Total worked</div><div>'+dur(st.w)+'</div><div class="k">Total break</div><div>'+dur(st.b)+'</div></div>';
+  const rg=sl.s.length?sl.s.map(x=>'<div>'+t12(x.i)+' – '+(x.o==null?'now':t12(x.o))+'</div>').join(''):'<div class="none">None</div>';
+  return '<div class="slot '+s+'"><h4>'+SHORT[s]+'</h4><div class="k">Clocked in</div>'+rg+'<div class="k">Total work</div><div>'+dur(st.w)+'</div><div class="k">Total break</div><div>'+dur(st.b)+'</div></div>';
 }
 function card(k,now){
   const L=S.logs[k],lab=new Date(dayStart(k)).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
@@ -150,8 +150,19 @@ loadForm();ensureToday();
 $('bIn').onclick=clockIn;$('bBrk').onclick=toggleBreak;$('bOut').onclick=clockOut;
 $('bSave').onclick=saveSettings;$('bClear').onclick=clearHistory;
 $('tabS').onclick=()=>setTab('session');$('tabH').onclick=()=>setTab('history');
+$('bReset').onclick=resetSettings;
 tick();renderHistory();setInterval(tick,1000);
 
 /* Large screens: Session / Options tabs in the left column */
 function setSub(t){$('left').dataset.sub=t;$('subS').setAttribute('aria-selected',t==='session');$('subO').setAttribute('aria-selected',t==='options')}
 $('subS').onclick=()=>setSub('session');$('subO').onclick=()=>setSub('options');
+
+async function resetSettings(){
+  const count=Object.keys(S.logs).length;
+  if(count>DEF.max){
+    const del=count-DEF.max;
+    if(!await ask('Delete older logs?','This will permanently delete the '+del+' oldest '+(del===1?'log':'logs')+'.','Delete and save'))return;
+  }
+  S.set={...DEF};trim();save();loadForm();refresh();
+  $('err').hidden=true;flash($('msg'),'Defaults restored.',3000);
+}
