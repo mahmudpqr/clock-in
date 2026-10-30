@@ -73,7 +73,7 @@ function renderStatus(now){
 }
 function slotHtml(sl,s,now){
   const st=stats(sl,now);
-  const rg=sl.s.length?sl.s.map(x=>'<div>'+t12(x.i)+' – '+(x.o==null?'now':t12(x.o))+'</div>').join(''):'<div class="none">None</div>';
+  const rg=sl.s.length?sl.s.map(x=>'<div class="present">'+t12(x.i)+' – '+(x.o==null?'now':t12(x.o))+'</div>').join(''):'<div class="absent">None</div>';
   return '<div class="slot '+s+'"><h4>'+SHORT[s]+'</h4><div class="k">Clocked in</div>'+rg+'<div class="k">Total work</div><div>'+dur(st.w)+'</div><div class="k">Total break</div><div>'+dur(st.b)+'</div></div>';
 }
 function card(k,now){
