@@ -13,9 +13,19 @@ const hms=ms=>{const t=Math.max(0,Math.floor(ms/1000));return pad(Math.floor(t/3
 const dur=ms=>{const m=Math.max(0,Math.floor(ms/60000));return Math.floor(m/60)+'h '+pad(m%60)+'m'};
 const endMin=s=>S.set[s==='work'?'we':'oe'];
 const slotEnd=(date,s)=>dayStart(date)+endMin(s)*60000;
+const emptyLog=()=>({work:{s:[],b:[]},ot:{s:[],b:[]}});
+
+function ensureToday(){
+  const t=key(new Date());
+  if(S.logs[t])return false;
+  const lastK=Object.keys(S.logs).sort().pop();
+  const d=new Date(lastK&&lastK<t?dayStart(lastK):Date.now());
+  if(lastK&&lastK<t)d.setDate(d.getDate()+1);
+  for(;key(d)<=t;d.setDate(d.getDate()+1))S.logs[key(d)]=emptyLog();
+  trim();save();return true;
+}
 
 function trim(max=S.set.max){const ks=Object.keys(S.logs).sort();for(let i=0;i<ks.length-max;i++)delete S.logs[ks[i]];if(S.open&&!S.logs[S.open.date])S.open=null}
-function ensureToday(){const k=key(new Date());if(S.logs[k])return false;S.logs[k]={work:{s:[],b:[]},ot:{s:[],b:[]}};trim();save();return true}
 function curSlot(d){const m=d.getHours()*60+d.getMinutes()+d.getSeconds()/60,s=S.set;if(m>=s.ws&&m<s.we)return'work';if(m>=s.os&&m<s.oe)return'ot';return null}
 const openSlot=()=>S.open&&S.logs[S.open.date][S.open.slot];
 const last=a=>a[a.length-1];
